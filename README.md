@@ -25,9 +25,9 @@ docker-compose run --rm app sh -c "flake8"
 
 docker-compose run --rm app sh -c "python manage.py test"
 
-#### Create core app
+#### Create api app
 
-docker-compose run --rm app sh -c "python manage.py startapp core"
+docker-compose run --rm app sh -c "python manage.py startapp api"
 
 #### Test if database is ready
 
