@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import RoomJoinPage from './RoomJoinPage';
 import CreateRoomPage from './CreateRoomPage';
+import Room from './Room'
 
 interface Props {
 
@@ -31,6 +32,7 @@ export default class HomePage extends React.Component<Props, State> {
                 </Route>
                 <Route path='/join' component={RoomJoinPage} />
                 <Route path='/create' component={CreateRoomPage} />
+                <Route path='/room/:roomCode' component={Room} />
             </Switch>
         </Router>)
     }
