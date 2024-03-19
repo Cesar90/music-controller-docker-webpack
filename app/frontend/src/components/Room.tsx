@@ -1,9 +1,10 @@
 import React from 'react';
 import { RouteComponentProps, Link } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core"
+import CreateRoomPage from './CreateRoomPage';
 
 interface RouteParams {
-    roomCode?: string
+    roomCode?: string;
 }
 
 interface Props extends RouteComponentProps<RouteParams> {
@@ -14,6 +15,7 @@ interface State {
     guestCanPause: boolean;
     votesToSkip: number;
     isHost: boolean;
+    showSettings: boolean;
 }
 
 type CamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer P3}`
@@ -42,12 +44,16 @@ export default class Room extends React.Component<Props, State>{
         this.state = {
             votesToSkip: 2,
             guestCanPause: false,
-            isHost: false
+            isHost: false,
+            showSettings: false
         }
         this.getRoomDetails = this.getRoomDetails.bind(this);
         this.roomCode = this.props.match.params.roomCode;
         this.getRoomDetails();
         this.leaveButtonPressed = this.leaveButtonPressed.bind(this);
+        this.updateShowSettings = this.updateShowSettings.bind(this);
+        this.renderSettingsButton = this.renderSettingsButton.bind(this);
+        this.renderSettions = this.renderSettions.bind(this);
     }
 
     getRoomDetails() {
@@ -79,7 +85,54 @@ export default class Room extends React.Component<Props, State>{
         })
     }
 
+    updateShowSettings(value: boolean) {
+        this.setState({
+            showSettings: value
+        })
+    }
+
+    renderSettions() {
+        return (
+            <Grid container spacing={1} alignItems="center" justifyContent="center" direction="column">
+                <Grid item xs={12}>
+                    <CreateRoomPage
+                        {...this.props}
+                        update={true}
+                        votesToSkip={this.state.votesToSkip}
+                        guestCanPause={this.state.guestCanPause}
+                        roomCode={this.roomCode}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={() => this.updateShowSettings(false)}>
+                        Close
+                    </Button>
+                </Grid>
+            </Grid>
+        );
+    }
+
+    renderSettingsButton() {
+        return (
+            <Grid item xs={12}>
+                <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={() => this.updateShowSettings(true)}>
+                    Settings
+                </Button>
+            </Grid>
+        );
+    }
+
     render() {
+        if (this.state.showSettings) {
+            return this.renderSettions();
+        }
+
         return (
             <Grid container spacing={1} alignItems="center" justifyContent="center" direction="column">
                 <Grid item xs={12}>
@@ -102,6 +155,8 @@ export default class Room extends React.Component<Props, State>{
                         Host: {this.state.isHost.toString()}
                     </Typography>
                 </Grid>
+                {this.state.isHost ? this.renderSettingsButton() : null
+                }
                 <Grid item xs={12}>
                     <Button variant="contained" color="secondary" onClick={this.leaveButtonPressed}>
                         Leave Room

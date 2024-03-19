@@ -12,7 +12,10 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Link } from "react-router-dom";
 
 interface Props extends RouteComponentProps {
-
+    update: boolean
+    votesToSkip: number
+    guestCanPause: boolean
+    roomCode: string
 }
 
 interface State {
