@@ -1,12 +1,13 @@
 import React from 'react';
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, Link } from "react-router-dom";
+import { Grid, Button, Typography } from "@material-ui/core"
 
 interface RouteParams {
-    roomCode: string
+    roomCode?: string
 }
 
 interface Props extends RouteComponentProps<RouteParams> {
-
+    leaveRoomCallback: () => void;
 }
 
 interface State {
@@ -46,11 +47,18 @@ export default class Room extends React.Component<Props, State>{
         this.getRoomDetails = this.getRoomDetails.bind(this);
         this.roomCode = this.props.match.params.roomCode;
         this.getRoomDetails();
+        this.leaveButtonPressed = this.leaveButtonPressed.bind(this);
     }
 
     getRoomDetails() {
         fetch('/api/get-room' + '?code=' + this.roomCode)
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    this.props.leaveRoomCallback();
+                    this.props.history.push("/")
+                }
+                return response.json()
+            })
             .then((data: KeysToSnakeCase<State>) => {
                 this.setState({
                     votesToSkip: data.votes_to_skip,
@@ -60,12 +68,52 @@ export default class Room extends React.Component<Props, State>{
             });
     }
 
+    leaveButtonPressed() {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        }
+        fetch('/api/leave-room', requestOptions).then((_response) => {
+            this.props.leaveRoomCallback();
+            this.props.history.push("/")
+        })
+    }
+
     render() {
-        return <div>
-            <h3>{this.roomCode}</h3>
-            <p>Votes: {this.state.votesToSkip}</p>
-            <p>Guest can Pause: {this.state.guestCanPause.toString()}</p>
-            <p>Host: {this.state.isHost.toString()}</p>
-        </div>
+        return (
+            <Grid container spacing={1} alignItems="center" justifyContent="center" direction="column">
+                <Grid item xs={12}>
+                    <Typography variant='h4' component="h4">
+                        Code: {this.roomCode}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant='h6' component="h6">
+                        Votes: {this.state.votesToSkip}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant='h6' component="h6">
+                        Guest can Pause: {this.state.guestCanPause.toString()}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant='h6' component="h6">
+                        Host: {this.state.isHost.toString()}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Button variant="contained" color="secondary" onClick={this.leaveButtonPressed}>
+                        Leave Room
+                    </Button>
+                </Grid>
+            </Grid>
+        )
+        // return <div>
+        //     <h3>{this.roomCode}</h3>
+        //     <p>Votes: {this.state.votesToSkip}</p>
+        //     <p>Guest can Pause: {this.state.guestCanPause.toString()}</p>
+        //     <p>Host: {this.state.isHost.toString()}</p>
+        // </div>
     }
 }

@@ -12,7 +12,6 @@ import CreateRoomPage from './CreateRoomPage';
 import Room from './Room'
 
 interface Props {
-
 }
 
 interface State {
@@ -27,6 +26,7 @@ export default class HomePage extends React.Component<Props, State> {
         this.state = {
             roomCode: ''
         }
+        this.clearRoomCode = this.clearRoomCode.bind(this);
     }
 
     async componentDidMount() {
@@ -77,6 +77,12 @@ export default class HomePage extends React.Component<Props, State> {
         );
     }
 
+    clearRoomCode() {
+        this.setState({
+            roomCode: '',
+        });
+    }
+
     render() {
         return (<Router>
             <Switch>
@@ -86,7 +92,13 @@ export default class HomePage extends React.Component<Props, State> {
 
                 <Route path='/join' component={RoomJoinPage} />
                 <Route path='/create' component={CreateRoomPage} />
-                <Route path='/room/:roomCode' component={Room} />
+                {/* <Route path='/room/:roomCode' component={Room} /> */}
+                <Route
+                    path="/room/:roomCode"
+                    render={(props) => {
+                        return <Room {...props} leaveRoomCallback={this.clearRoomCode} />
+                    }}
+                />
             </Switch>
         </Router>)
     }
