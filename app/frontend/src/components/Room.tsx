@@ -16,6 +16,7 @@ interface State {
     votesToSkip: number;
     isHost: boolean;
     showSettings: boolean;
+    spotifyAuthenticated: boolean;
 }
 
 type CamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer P3}`
@@ -45,7 +46,8 @@ export default class Room extends React.Component<Props, State>{
             votesToSkip: 2,
             guestCanPause: false,
             isHost: false,
-            showSettings: false
+            showSettings: false,
+            spotifyAuthenticated: false,
         }
         this.getRoomDetails = this.getRoomDetails.bind(this);
         this.roomCode = this.props.match.params.roomCode;
@@ -54,6 +56,7 @@ export default class Room extends React.Component<Props, State>{
         this.renderSettingsButton = this.renderSettingsButton.bind(this);
         this.renderSettions = this.renderSettions.bind(this);
         this.getRoomDetails = this.getRoomDetails.bind(this);
+        this.authenticateSpotify = this.authenticateSpotify.bind(this);
         this.getRoomDetails();
     }
 
@@ -72,7 +75,29 @@ export default class Room extends React.Component<Props, State>{
                     guestCanPause: data.guest_can_pause,
                     isHost: data.is_host
                 })
+                if (this.state.isHost) {
+                    this.authenticateSpotify();
+                }
             });
+    }
+
+    authenticateSpotify() {
+        fetch('/spotify/is-authenticated')
+            .then((response) => response.json())
+            .then((data: { status: boolean }) => {
+                this.setState({
+                    spotifyAuthenticated: data.status
+                });
+                if (!data.status) {
+                    fetch('/spotify/get-auth-url')
+                        .then((response) => response.json())
+                        .then((data: { url: string }) => {
+                            // console.log("data", data);
+                            // debugger;
+                            window.location.replace(data.url)
+                        })
+                }
+            })
     }
 
     leaveButtonPressed() {
