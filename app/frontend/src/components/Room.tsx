@@ -2,6 +2,8 @@ import React from 'react';
 import { RouteComponentProps, Link } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core"
 import CreateRoomPage from './CreateRoomPage';
+import MusicPlayer from './MusicPlayer';
+import { KeysToSnakeCase, ISong } from 'src/utils';
 
 interface RouteParams {
     roomCode?: string;
@@ -17,28 +19,13 @@ interface State {
     isHost: boolean;
     showSettings: boolean;
     spotifyAuthenticated: boolean;
-}
-
-type CamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer P3}`
-    ? `${Lowercase<P1>}${Uppercase<P2>}${CamelCase<P3>}`
-    : Lowercase<S>
-
-type KeysToCamelCase<T> = {
-    [K in keyof T as CamelCase<string & K>]: T[K]
-}
-
-
-type CamelToSnakeCase<S extends string> = S extends `${infer T}${infer U}` ?
-    `${T extends Capitalize<T> ? "_" : ""}${Lowercase<T>}${CamelToSnakeCase<U>}` :
-    S
-
-type KeysToSnakeCase<T> = {
-    [K in keyof T as CamelToSnakeCase<string & K>]: T[K]
+    song: ISong
 }
 
 
 export default class Room extends React.Component<Props, State>{
     roomCode: string = '';
+    interval: ReturnType<typeof setInterval>
 
     constructor(props: Props) {
         super(props);
@@ -48,6 +35,13 @@ export default class Room extends React.Component<Props, State>{
             isHost: false,
             showSettings: false,
             spotifyAuthenticated: false,
+            song: {
+                image_url: '',
+                title: '',
+                is_playing: false,
+                time: 0,
+                duration: 0,
+            }
         }
         this.getRoomDetails = this.getRoomDetails.bind(this);
         this.roomCode = this.props.match.params.roomCode;
@@ -57,8 +51,18 @@ export default class Room extends React.Component<Props, State>{
         this.renderSettions = this.renderSettions.bind(this);
         this.getRoomDetails = this.getRoomDetails.bind(this);
         this.authenticateSpotify = this.authenticateSpotify.bind(this);
+        this.getCurrentSong = this.getCurrentSong.bind(this);
         this.getRoomDetails();
+        this.getCurrentSong();
     }
+
+    // componentDidMount(): void {
+    //     this.interval = setInterval(this.getCurrentSong, 1000)
+    // }
+
+    // componentWillUnmount(): void {
+    //     clearInterval(this.interval)
+    // }
 
     getRoomDetails() {
         fetch('/api/get-room' + '?code=' + this.roomCode)
@@ -98,6 +102,19 @@ export default class Room extends React.Component<Props, State>{
                         })
                 }
             })
+    }
+
+    getCurrentSong() {
+        fetch('/spotify/current-song').then((response) => {
+            if (!response.ok) {
+                return {};
+            } else {
+                return response.json();
+            }
+        }).then((data: ISong) => {
+            this.setState({ song: data })
+            console.log(data);
+        })
     }
 
     leaveButtonPressed() {
@@ -167,23 +184,8 @@ export default class Room extends React.Component<Props, State>{
                         Code: {this.roomCode}
                     </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                    <Typography variant='h6' component="h6">
-                        Votes: {this.state.votesToSkip}
-                    </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant='h6' component="h6">
-                        Guest can Pause: {this.state.guestCanPause.toString()}
-                    </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant='h6' component="h6">
-                        Host: {this.state.isHost.toString()}
-                    </Typography>
-                </Grid>
-                {this.state.isHost ? this.renderSettingsButton() : null
-                }
+                <MusicPlayer {...this.state.song} />
+                {this.state.isHost ? this.renderSettingsButton() : null}
                 <Grid item xs={12}>
                     <Button variant="contained" color="secondary" onClick={this.leaveButtonPressed}>
                         Leave Room
