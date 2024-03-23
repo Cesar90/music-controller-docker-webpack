@@ -3,6 +3,8 @@ export interface ISong {
     title: string;
     is_playing: boolean;
     time: number;
+    votes: number;
+    votes_required: number;
     duration: number;
 }
 

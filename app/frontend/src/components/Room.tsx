@@ -41,6 +41,8 @@ export default class Room extends React.Component<Props, State>{
                 is_playing: false,
                 time: 0,
                 duration: 0,
+                votes: 0,
+                votes_required: 0
             }
         }
         this.getRoomDetails = this.getRoomDetails.bind(this);
