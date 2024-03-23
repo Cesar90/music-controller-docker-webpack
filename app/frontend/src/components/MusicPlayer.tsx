@@ -1,13 +1,9 @@
 import React from 'react';
 import { Grid, Typography, Card, IconButton, LinearProgress, Icon } from '@material-ui/core';
 import { PlayArrow, SkipNext, Pause } from '@material-ui/icons';
+import { ISong } from 'src/utils';
 
-interface Props {
-    image_url: string;
-    title: string;
-    is_playing: boolean;
-    time: number;
-    duration: number;
+interface Props extends ISong {
 }
 
 interface State {
@@ -17,6 +13,22 @@ interface State {
 export default class MusicPlayer extends React.Component<Props, State>{
     constructor(props: Props) {
         super(props)
+    }
+
+    pauseSong() {
+        const requestOptions = {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" }
+        };
+        fetch('/spotify/pause', requestOptions);
+    }
+
+    playSong() {
+        const requestOptions = {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" }
+        };
+        fetch('/spotify/play', requestOptions);
     }
 
     render() {
@@ -36,7 +48,7 @@ export default class MusicPlayer extends React.Component<Props, State>{
                             {this.props.title}
                         </Typography>
                         <div>
-                            <IconButton>
+                            <IconButton onClick={() => this.props.is_playing ? this.pauseSong() : this.playSong()}>
                                 {this.props.is_playing ? <Pause /> : <PlayArrow />}
                             </IconButton>
                             <IconButton>
