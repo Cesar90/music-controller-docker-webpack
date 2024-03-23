@@ -7,74 +7,50 @@ Play and Stop Music
 Project based on Djando Framework, for developement uses docker, webpack, react with typescript
 
 ## Getting Started
-### Development
 
 #### Build project with docker-compose
-
+Build docker images of  ```django``` and  ```frontend(webpack)```, run this command in root of project
+```bash
 docker-compose build
-
+```
+#### Run project
+After of build image, up project
+```bash
+docker-compose up
+```
 #### Create django project
-
+```bash
 docker-compose run --rm app sh -c "django-admin startproject app ."
-
-#### Run Linting
-
-docker-compose run --rm app sh -c "flake8"
-
-#### Run Testing
-
-docker-compose run --rm app sh -c "python manage.py test"
-
+```
 #### Create api app
-
+```bash
 docker-compose run --rm app sh -c "python manage.py startapp api"
-
+```
 #### Create frontend app
-
+```bash
 docker-compose run --rm app sh -c "python manage.py startapp frontend"
-
-
-#### Test if database is ready
-
-docker-compose run --rm app sh -c "python manage.py wait_for_db"
-
-#### Fix flake8 erros
-
-docker-compose run --rm app sh -c "python /app/flake8_autofix.py"
-
-#### Test if database is ready and run flake8
-
-docker-compose run --rm app sh -c "python manage.py wait_for_db && flake8"
-
+```
+#### Create frontend spotify
+```bash
+docker-compose run --rm app sh -c "python manage.py startapp spotify"
+```
 # Create migrations
-
+```bash
 docker-compose run --rm app sh -c "python manage.py makemigrations"
-
+```
 # Run migrations
-
-docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py migrate"
-
-Want to contribute? Great!
-
-Dillinger uses Gulp + Webpack for fast developing.
-Make a change in your file and instantaneously see your updates!
-
-Open your favorite Terminal and run these commands.
-
-First Tab:
-
-```sh
-node app
+```bash
+docker-compose run --rm app sh -c "python manage.py migrate"
 ```
 
-Second Tab:
+## Typescript
+### Fixing issue of types in VS Code
 
-```sh
-gulp watch
+First cd into the ```frontend``` folder.
+```bash
+cd frontend
 ```
-
-(optional) Third:
-
-```sh
-karma test
+Copy node_modules folder from container to host with docker command
+```bash
+docker cp music-controller-docker-webpack-frontend-1:/app/node_modules/ ./
 ```

@@ -9,7 +9,8 @@ import {
 import { Grid, Button, ButtonGroup, Typography } from "@material-ui/core"
 import RoomJoinPage from './RoomJoinPage';
 import CreateRoomPage from './CreateRoomPage';
-import Room from './Room'
+import Room from './Room';
+import Info from './Info'
 
 interface Props {
 }
@@ -68,6 +69,9 @@ export default class HomePage extends React.Component<Props, State> {
                         <Button component={Link} to="/join" color="primary">
                             Join a Room
                         </Button>
+                        <Button component={Link} to="/info" color="default">
+                            Info
+                        </Button>
                         <Button component={Link} to="/create" color="secondary">
                             Create a Room
                         </Button>
@@ -91,6 +95,7 @@ export default class HomePage extends React.Component<Props, State> {
                 }} />
 
                 <Route path='/join' component={RoomJoinPage} />
+                <Route path='/info' component={Info} />
                 <Route path='/create' component={CreateRoomPage} />
                 {/* <Route path='/room/:roomCode' component={Room} /> */}
                 <Route
